@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>SoundTrace</title>
+  <style>
+    /* ベースリセット */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: "Yu Gothic", sans-serif;
+    }
+    body {
+      display: flex;  /* 左右2カラム想定 */
+      overflow: hidden;
+    }
+   /* ▼ 左カラム ------------------------------------------------ */
+   .left {
+      /* 縦に並べる指定 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;   /* 中央寄せ (水平) */
+      width: 70%;
+      height: 100vh;
+      background-color: #ffffff;
+      overflow: hidden; 
+      padding: 50px;
+    }
+
+    .img-container {
+      position: relative;
+      width: 80%;       /* 画像＋SVGの横幅を80%に */
+      max-width: 600px; /* 必要に応じて最大幅を制限 */
+      flex-shrink: 0;   /* 縦方向に圧縮されないように */
+    }
+    .img-container img {
+      display: block;
+      width: 100%;      /* 親要素に合わせる */
+      height: auto;
+      object-fit: contain;
+    }
+    .img-container svg {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    /* ▼ シークバー（左カラム内に配置） */
+    .seekbar-container {
+      width: 80%;        /* 同じく幅80% */
+      max-width: 600px;
+      margin-top: 10px;  /* 画像＋SVGとの隙間 */
+      flex-shrink: 0; 
+      text-align: center;
+    }
+    .seekbar-container input[type="range"] {
+      width: 100%;
+    }
+    .seekbar-container label {
+      margin-right: 5px;
+    }
+
+    /* パスや円のスタイル */
+    #motionPath {
+      stroke: black;
+      stroke-width: 2;
+      fill: none;
+    }
+    #movingCircle {
+      fill: red;
+    }
+
+  </style>
+</head>
+
+</body>
+  <!-- 左カラム：画像 + SVG -->
+  <div class="left">
+    <div class="img-container">
+      <img src="map2_passandmap.png" alt="背景画像" />
+      <svg id="mySVG" viewBox="0 0 1000 1200" xmlns="http://www.w3.org/2000/svg">
+        <!-- グループ化しつつ transform で位置調整している例 -->
+        <g transform="translate(-149, 0)scale(1.1)">
+          <path id="motionPath" d="M728,644.5c-5.23-8.53-7.16-15.76-8-20
+          c-13.21-66.7,98.33-125.59,136-222c6.15-15.75,11.76-36.14,9-60
+          c-0.64-5.51-3.36-25.36-18-50c-18.04-30.36-41.05-45.92-57-58
+          c-79.45-60.21-106.31-127.31-127-118c-6.67,3-4.22,10.13-19,33
+          c-7.76,12-14.04,18.71-26,32c-49.49,54.99-42.58,51.92-60,68
+          c-28.6,26.4-38.3,26.43-40,39c-3.08,22.79,25.64,45.85,47,63
+          c17.96,14.42,19.21,11.05,46,31c20.34,15.15,34.33,25.71,49,44
+          c1.98,2.47,9.99,15.98,26,43c5.98,10.09,11.15,19,8,23
+          c-2.66,3.38-8.33-0.48-14,1c-22.2,5.81-22.83,88.07-40,123
+          c-2.14,4.36-5.67,10.27-12,15c-8.11,6.06-16.24,6.78-24,8
+          c-30.07,4.73-29.53,13.07-47,13c-14.01-0.05-37.7-5.5-43-20
+          c-5.63-15.41,15.59-24.41,19-55c0.61-5.5-2.25-20.07-8-49
+          c-7.81-39.3-10.4-45.48-12-49c-8.08-17.83-11.94-14.57-24-38
+          c-8.09-15.73-7.16-18.77-18-40c-6.93-13.57-10.4-20.36-15-27
+          c-11.27-16.25-20.2-22.29-18-29c1.32-4.01,5.39-4.52,14-9
+          c18.04-9.39,28.18-21.78,28-22c-0.26-0.32-22.3,24.97-58,38
+          c-19.24,7.02-31,10-31,10c-20.71,5.24-27.92,4.27-31,10
+          c-2.77,5.17,0.87,10.07,13,37c5.96,13.22,8.94,19.84,12,28
+          c5.9,15.73,8.78,28.15,12,42c2.52,10.86,5.1,21.94,7,37
+          c2.2,17.41,0.51,16.46,3,38c2.58,22.29,3.87,33.43,4,34
+          c2.07,8.86,4.38,15.03,1,20c-3.7,5.43-9.68,2.79-14,8
+          c-4.19,5.05-0.92,10.4,0,29c0.38,7.72-0.24,5.5,0,25
+          c0.18,14.1,0.53,17.75,1,21c1.11,7.74,2.83,13.21,5,20
+          c5.71,17.87,7.97,15.94,13,32c2.17,6.92,3.26,12.1,8,18
+          c1.49,1.86,4.56,5.67,9,8c9.57,5.03,17.57-1.03,36-4
+          c4.13-0.67,13.75-0.78,33-1c21-0.24,19.58,0.42,32,0
+          c23.61-0.81,24.58-3.08,34-1c3.44,0.76,11.29,4.51,27,12
+          c14.58,6.96,17.56,8.85,18,12c0.73,5.19-6.28,7.61-15,18
+          c-3.96,4.72-5.3,7.53-15,27c-9.42,18.91-14.13,28.36-15,30
+          c-14.43,27.21-21.72,40.96-33,43c-10.89,1.97-19.6-8.04-32-19
+          c-37.9-33.51-47.25-20.32-102-60c-9.65-7-1.63-1.8-57-47
+          c-40.4-32.98-40.32-32.19-47-39c-24.33-24.8-33.65-43.66-44-41
+          c-5.45,1.4-4.55,7.06-13,21c-12.29,20.27-31.41,36.74-41,45
+          c-8.78,7.56-14.4,11.34-14,17c0.57,7.95,12.52,12.97,17,15
+          c29.01,13.17,28.43,30.03,77,70c27.66,22.77,23.61,13.81,68,47
+          c40.95,30.62,66,51,66,51c33.09,26.92,49.06,42.04,65,37
+          c7.6-2.4,11.75-8.3,17-16c27.55-40.39,41.33-60.58,45-69
+          c41.89-95.96,82.68-189.39,160-251c8.69-6.93,12.15-13.32,19-14
+          c2.46-0.24,7.52-0.15,9-3c0.69-1.34,0.38-2.89,0-4" 
+                fill="none" stroke="black" stroke-width="2" />
+          <!-- ここから circle を手動制御するために IDを付ける -->
+          <circle id="movingCircle" r="10" cx="0" cy="0" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- シークバー： ユーザーが動かすと移動 -->
+    <div class="seekbar-container">
+
+        <input id="seekbar" type="range" min="0" max="1" step="0.001" value="0" disabled />
+        </div>
+    </div>
+
+  <script>  
+    // 全体で使う変数
+    let ratio = 0;        // 0～1で表す「パス上の進捗」
+    let isUserDragging = false; // ユーザーがドラッグ中かどうか
+    let lastTime = 0;     // 前フレームの時間(ms)
+    const SPEED = 0.001/(32*60); // パス上を進むの速度 1msあたりの進む量
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const svg = document.getElementById('mySVG');
+      const path = document.getElementById('motionPath');
+      const circle = document.getElementById('movingCircle');
+      const seekbar = document.getElementById('seekbar');
+
+      // パス全長を取得
+      const pathLength = path.getTotalLength();
+
+      // パスを確実に計算できるように下記を設定（Safari対策など）
+      // パスを一度のけぞらせて長さを確定させる(古めのブラウザへの保険)
+      path.style.strokeDasharray = pathLength;
+      path.style.strokeDashoffset = pathLength;
+
+      // 初期位置を更新
+      updatePosition(0);
+
+      // シークバー操作 (マウス操作)
+      seekbar.addEventListener('input', () => {
+        ratio = parseFloat(seekbar.value);
+        updatePosition(ratio);
+      });
+
+      // requestAnimationFrame で自動アニメーション
+      function animate(timestamp) {
+        if (!lastTime) {
+          lastTime = timestamp;
+        }
+        const delta = timestamp - lastTime; // 前フレームからの経過時間(ms)
+        lastTime = timestamp;
+
+        // ユーザーがドラッグ中でなければ自動進行
+        if (!isUserDragging) {
+          ratio += SPEED * delta;  
+          if (ratio > 1) ratio = ratio % 1; // ループしたいなら ratio = ratio % 1 
+          updatePosition(ratio);
+          // シークバーも同期
+          seekbar.value = ratio;
+        }
+
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+
+      // マウスダウン中は isUserDragging = true にする (必要に応じて)
+      seekbar.addEventListener('mousedown', () => {
+        isUserDragging = true;
+      });
+      // マウスアップでドラッグ終わり
+      seekbar.addEventListener('mouseup', () => {
+        isUserDragging = false;
+        // ドラッグ完了時点の ratio を確定
+        ratio = parseFloat(seekbar.value);
+      });
+      // （スマホ等タッチ操作にも対応するなら touchstart/touchend も追加）
+
+      // 実際にcircleをパス上に配置する関数
+      function updatePosition(ratioValue) {
+        // ratioValue * pathLength = パス上の長さ
+        const distance = ratioValue * pathLength;
+        const point = path.getPointAtLength(distance);
+
+        circle.setAttribute('cx', point.x);
+        circle.setAttribute('cy', point.y);
+      }
+    });
+  </script>
+
+  <!-- 右カラム：オーディオミキサー  -->
+  <div class="right">
+    <style>
+      body {
+          margin-top: 50px; /* 頭に50pxの空白を作る */
+      }
+  </style>
+    <h1>Sound Trace</h1>
+    <div id="mixer">
+
+      </script>
+      <!-- 1つ目のトラック -->
+      <div class="track">
+        <p>morning ambience </p>
+        <audio id="audio1" src="audio/morning_mic.mp3" preload="metadata" autoplay loop></audio>
+        <input type="range" id="fader1" min="0" max="1" step="0.01" value="0">
+      </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const audio1 = document.getElementById('audio1');
+            const fader1 = document.getElementById('fader1');
+
+    // ロード時点でフェーダーの値を反映 → この時点でほぼ0 0にするとなぜか挙動が変わる！
+            audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => {  // スライダーを動かしたら音量更新
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+
+      <!-- 2つ目のトラック -->
+      <div class="track">
+        <p>morning sinewave</p>
+        <audio id="audio2" src="audio/morning_sine.mp3" autoplay loop></audio>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="fader2">
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const audio1 = document.getElementById('audio2');
+          const fader1 = document.getElementById('fader2');
+        
+          // フェーダーの値が変わったら、audio1.volumeを更新
+          audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => {  // スライダーを動かしたら音量更新
+                audio1.muted = false;
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+
+      <!-- 3つ目のトラック -->
+      <div class="track">
+        <p>&nbsp;</p>
+        <p>afternoon ambience</p>
+        <audio id="audio3" src="audio/noon_mic.mp3" loop autoplay></audio>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="fader3">
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const audio1 = document.getElementById('audio3');
+          const fader1 = document.getElementById('fader3');
+        
+          // フェーダーの値が変わったら、audio1.volumeを更新
+          audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => {  // スライダーを動かしたら音量更新
+                audio1.muted = false;
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+
+      <!-- 4つ目のトラック -->
+      <div class="track">
+        <p>afternoon sinewave</p>
+        <audio id="audio4" src="audio/noon_sine.mp3" loop autoplay></audio>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="fader4">
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const audio1 = document.getElementById('audio4');
+          const fader1 = document.getElementById('fader4');
+        
+          // フェーダーの値が変わったら、audio1.volumeを更新
+          audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => { // スライダーを動かしたら音量更新
+                audio1.muted = false;
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+
+      <!-- 5つ目のトラック -->
+      <div class="track">
+        <p>&nbsp;</p>
+        <p>midnight ambience</p>
+        <audio id="audio5" src="audio/night_mic.mp3" loop autoplay></audio>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="fader5">
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const audio1 = document.getElementById('audio5');
+          const fader1 = document.getElementById('fader5');
+        
+          // フェーダーの値が変わったら、audio1.volumeを更新
+          audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => {  // スライダーを動かしたら音量更新
+                audio1.muted = false;
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+
+      <!-- 6つ目のトラック -->
+      <div class="track">
+        <p>midnight sinewave</p>
+        <audio id="audio6" src="audio/night_sine.mp3" loop autoplay></audio>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="fader6">
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const audio1 = document.getElementById('audio6');
+          const fader1 = document.getElementById('fader6');
+        
+          // フェーダーの値が変わったら、audio1.volumeを更新
+          audio1.volume = 0.0000000001
+              fader1.addEventListener('input', () => {  // スライダーを動かしたら音量更新
+                audio1.muted = false;
+                audio1.volume = fader1.value;
+              });
+            });
+        </script>
+    </div>
+  </div>
+</body>
+
+</html>
